@@ -72,7 +72,20 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
 		// the actual search
-        // TODO: Fill this in.
+        Node bop = root;
+        while (bop != null){
+        	int val = k.compareTo(bop.key);
+        	
+        	if (val < 0) {
+        		bop = bop.left;
+        	}
+        	else if (val > 0){
+        		bop = bop.right;
+        	}
+        	else{
+        		return bop;
+        	}
+        }
         return null;
 	}
 
@@ -92,7 +105,21 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
-		return false;
+		return containsHelp(root, target);
+	
+	}
+	public boolean containsHelp(Node bop, Object target){
+		if (bop == null){
+			return false;
+		}
+		Node bops = bop;
+		
+		if (equals(target, bops.value)){
+			return true;
+		}
+		else{
+			return containsHelp(bops.left,target) || containsHelp(bops.right,target);
+		}
 	}
 
 	@Override
@@ -117,8 +144,14 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+        add(root,set);
 		return set;
+	}
+	private void add(Node bop, Set<K> set) {
+	    if (bop == null) return;
+	    add(bop.left, set);
+	    set.add(bop.key);
+	    add(bop.right, set);        
 	}
 
 	@Override
@@ -135,8 +168,35 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+		
+		@SuppressWarnings("unchecked") 
+		Comparable<? super K> compare = (Comparable<? super K>) key; 
+		int check = compare.compareTo(node.key);
+		if (check < 0){
+			
+			if (node.left == null){
+				
+				node.left = new Node(key, value); 
+				size++;
+				return null; 
+			}
+			putHelper(node.left, key, value);
+		}
+		if (check > 0){
+			
+			if (node.right == null){
+				
+				node.right = new Node(key, value); 
+				size++;
+				return null; 
+			}
+			putHelper(node.right, key, value);
+			
+		}
+		V old = node.value;
+		node.value = value;
+		return old; 
+
 	}
 
 	@Override
@@ -211,6 +271,8 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		this.root = node;
 		this.size = size;
 	}
+	
+	
 
 	/**
 	 * Returns the height of the tree.
